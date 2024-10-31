@@ -8,12 +8,14 @@ import OnboardTourHandler from '../tutorials/dbot-tours/onboarding-tour';
 import { rudderstackDashboardClose, rudderstackDashboardOpen } from './analytics/rudderstack-dashboard';
 import Local from './load-bot-preview/local';
 import Cards from './cards';
-import './style.css';
+import InfoPanel from './info-panel';
+import UserGuide from './user-guide';
+
 type TMobileIconGuide = {
     handleTabChange: (active_number: number) => void;
 };
 
-const BinaryToolsBots = observer(({ handleTabChange }: TMobileIconGuide) => {
+const DashboardComponent = observer(({ handleTabChange }: TMobileIconGuide) => {
     const { ui } = useStore();
     const { load_modal, dashboard } = useDBotStore();
     const { dashboard_strategies } = load_modal;
@@ -49,10 +51,15 @@ const BinaryToolsBots = observer(({ handleTabChange }: TMobileIconGuide) => {
                 })}
             >
                 <div className='tab__dashboard__content'>
+                    <UserGuide
+                        is_mobile={is_mobile}
+                        handleTabChange={handleTabChange}
+                        setActiveTabTutorial={setActiveTabTutorial}
+                    />
                     <div className='quick-panel'>
                         <div
                             className={classNames('tab__dashboard__header', {
-                                'binarytools_tab__dashboard__header--listed': !is_mobile && has_dashboard_strategies,
+                                'tab__dashboard__header--listed': !is_mobile && has_dashboard_strategies,
                             })}
                         >
                             {!has_dashboard_strategies && (
@@ -64,9 +71,20 @@ const BinaryToolsBots = observer(({ handleTabChange }: TMobileIconGuide) => {
                                     line_height='xxl'
                                     weight='bold'
                                 >
-                                    {localize('Load or Pick free bot')}
+                                    {localize('Load or build your bot')}
                                 </Text>
                             )}
+                            <Text
+                                as='p'
+                                color='prominent'
+                                line_height='s'
+                                size={is_mobile ? 'xxs' : 's'}
+                                className={classNames('subtitle', { 'subtitle__has-list': has_dashboard_strategies })}
+                            >
+                                {localize(
+                                    'Import a bot from your computer or Google Drive, build it from scratch, or start with a quick strategy.'
+                                )}
+                            </Text>
                         </div>
                         <div
                             className={classNames('tab__dashboard__centered', {
@@ -78,11 +96,7 @@ const BinaryToolsBots = observer(({ handleTabChange }: TMobileIconGuide) => {
                         </div>
                         {is_mobile && <Local />}
                     </div>
-                    <div
-                        className={classNames('preview-panel', {
-                            'binarytools-preview-panel--active': has_dashboard_strategies,
-                        })}
-                    >
+                    <div className={classNames('preview-panel', { 'preview-panel--active': has_dashboard_strategies })}>
                         {has_dashboard_strategies && !is_mobile && (
                             <div className='tab__dashboard__preview'>
                                 <Local />
@@ -91,9 +105,10 @@ const BinaryToolsBots = observer(({ handleTabChange }: TMobileIconGuide) => {
                     </div>
                 </div>
             </div>
+            <InfoPanel />
             {active_tab === 0 && <OnboardTourHandler is_mobile={is_mobile} />}
         </React.Fragment>
     );
 });
 
-export default BinaryToolsBots;
+export default DashboardComponent;
